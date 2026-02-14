@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Payment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth transition for hiding/showing elements */
+        .hidden-content {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <a href="tenant-dashboard.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div id="step-1" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+                    <h2 class="text-2xl text-gray-900 mb-6 font-medium">Payment Method</h2>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                        <button onclick="selectMethod('card')" id="btn-card" class="payment-btn p-4 border-2 border-blue-600 bg-blue-50 rounded-lg transition-all text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 text-blue-600"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                            <p class="text-sm text-gray-700">Card</p>
+                        </button>
+                        <button onclick="selectMethod('bkash')" id="btn-bkash" class="payment-btn p-4 border-2 border-gray-200 hover:border-gray-300 rounded-lg transition-all text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 text-gray-400"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                            <p class="text-sm text-gray-700">bKash</p>
+                        </button>
+                        <button onclick="selectMethod('nagad')" id="btn-nagad" class="payment-btn p-4 border-2 border-gray-200 hover:border-gray-300 rounded-lg transition-all text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 text-gray-400"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                            <p class="text-sm text-gray-700">Nagad</p>
+                        </button>
+                        <button onclick="selectMethod('bank')" id="btn-bank" class="payment-btn p-4 border-2 border-gray-200 hover:border-gray-300 rounded-lg transition-all text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 text-gray-400"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="9" x2="9.01" y1="2" y2="2"/><line x1="15" x2="15.01" y1="2" y2="2"/><line x1="9" x2="9.01" y1="22" y2="22"/><line x1="15" x2="15.01" y1="22" y2="22"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                            <p class="text-sm text-gray-700">Bank</p>
+                        </button>
+                    </div>
+
+                    <div id="form-card" class="payment-form space-y-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2">Card Number</label>
+                            <input type="text" placeholder="1234 5678 9012 3456" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Cardholder Name</label>
+                            <input type="text" placeholder="JOHN SMITH" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Expiry Date</label>
+                                <input type="text" placeholder="MM/YY" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">CVV</label>
+                                <input type="text" placeholder="123" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="form-bkash" class="payment-form hidden-content space-y-6">
+                        <div class="bg-pink-50 border border-pink-200 rounded-lg p-6 text-center">
+                            <p class="text-gray-700 mb-2">Dial *247# and enter:</p>
+                            <p class="text-2xl text-pink-600 mb-2 font-bold">01700000000</p>
+                            <p class="text-gray-600">Reference: RNT-2026-001</p>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">bKash Account Number</label>
+                            <input type="tel" placeholder="01XXXXXXXXX" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Transaction ID</label>
+                            <input type="text" placeholder="Enter transaction ID" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                    </div>
+
+                    <div id="form-nagad" class="payment-form hidden-content space-y-6">
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-6 text-center">
+                            <p class="text-gray-700 mb-2">Dial *167# and enter:</p>
+                            <p class="text-2xl text-orange-600 mb-2 font-bold">01700000000</p>
+                            <p class="text-gray-600">Reference: RNT-2026-001</p>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Nagad Account Number</label>
+                            <input type="tel" placeholder="01XXXXXXXXX" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Transaction ID</label>
+                            <input type="text" placeholder="Enter transaction ID" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                    </div>
+
+                    <div id="form-bank" class="payment-form hidden-content space-y-6">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                            <h3 class="text-lg text-gray-900 mb-4 font-medium">Bank Account Details</h3>
+                            <div class="space-y-2 text-gray-700 text-sm">
+                                <p><span class="text-gray-600">Account Name:</span> RentEase Ltd.</p>
+                                <p><span class="text-gray-600">Account Number:</span> 1234567890</p>
+                                <p><span class="text-gray-600">Bank:</span> ABC Bank</p>
+                                <p><span class="text-gray-600">Branch:</span> Gulshan, Dhaka</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Upload Bank Receipt</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-600 transition-colors cursor-pointer bg-gray-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 text-gray-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                                <p class="text-gray-600">Click to upload receipt</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="processPayment()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors mt-8 font-medium shadow-md">
+                        Complete Payment
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm sticky top-24">
+                    <h3 class="text-lg text-gray-900 mb-4 font-medium">Payment Summary</h3>
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <p class="text-sm text-gray-600">Property</p>
+                            <p class="text-gray-900 font-medium">Modern Downtown Apartment</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Payment For</p>
+                            <p class="text-gray-900 font-medium">January 2026</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 pt-4 border-t border-gray-200">
+                        <div class="flex justify-between text-gray-700">
+                            <span>Rent</span>
+                            <span>৳25,000</span>
+                        </div>
+                        <div class="flex justify-between text-gray-700">
+                            <span>Service Charge</span>
+                            <span>৳2,500</span>
+                        </div>
+                        <div class="flex justify-between text-lg pt-3 border-t border-gray-200 font-medium">
+                            <span class="text-gray-900">Total</span>
+                            <span class="text-blue-600">৳27,500</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step-2" class="hidden-content text-center max-w-2xl mx-auto py-8">
+            <div class="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+                <div class="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <h2 class="text-2xl text-gray-900 mb-4 font-bold">Payment Successful!</h2>
+                <p class="text-gray-600 mb-8">
+                    Your rent payment for January 2026 has been processed successfully.
+                </p>
+
+                <div class="bg-gray-50 rounded-lg p-6 mb-8 text-left border border-gray-100">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-200 pb-2">
+                        <h3 class="text-lg text-gray-900 font-medium">Payment Receipt</h3>
+                        <span class="text-sm text-gray-600">Transaction ID: TXN-123456</span>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Date</span>
+                            <span class="text-gray-900">February 10, 2026</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Payment Method</span>
+                            <span id="receipt-method" class="text-gray-900 capitalize font-medium">Card</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Property</span>
+                            <span class="text-gray-900">Modern Downtown Apartment</span>
+                        </div>
+                        <div class="flex justify-between pt-3 border-t border-gray-200">
+                            <span class="text-gray-900 font-bold">Amount Paid</span>
+                            <span class="text-blue-600 font-bold">৳27,500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <a href="tenant-dashboard.html" class="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        Back to Dashboard
+                    </a>
+                    <button class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 font-medium shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        Download Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Keep track of current selection
+        let currentMethod = 'card';
+
+        function selectMethod(method) {
+            currentMethod = method;
+
+            // 1. Reset all buttons styles
+            const buttons = document.querySelectorAll('.payment-btn');
+            buttons.forEach(btn => {
+                btn.className = "payment-btn p-4 border-2 border-gray-200 hover:border-gray-300 rounded-lg transition-all text-center";
+                // Reset icon color (a bit hacky in vanilla JS but works)
+                btn.querySelector('svg').classList.remove('text-blue-600');
+                btn.querySelector('svg').classList.add('text-gray-400');
+            });
+
+            // 2. Highlight selected button
+            const activeBtn = document.getElementById('btn-' + method);
+            activeBtn.className = "payment-btn p-4 border-2 border-blue-600 bg-blue-50 rounded-lg transition-all text-center";
+            activeBtn.querySelector('svg').classList.remove('text-gray-400');
+            activeBtn.querySelector('svg').classList.add('text-blue-600');
+
+            // 3. Hide all forms & Show selected form
+            document.querySelectorAll('.payment-form').forEach(el => el.classList.add('hidden-content'));
+            document.getElementById('form-' + method).classList.remove('hidden-content');
+        }
+
+        function processPayment() {
+            // Simulate processing...
+            
+            // Hide Step 1
+            document.getElementById('step-1').classList.add('hidden-content');
+            
+            // Update Receipt Data
+            document.getElementById('receipt-method').innerText = currentMethod.charAt(0).toUpperCase() + currentMethod.slice(1);
+
+            // Show Step 2
+            document.getElementById('step-2').classList.remove('hidden-content');
+            
+            // Scroll to top
+            window.scrollTo(0,0);
+        }
+    </script>
+</body>
+</html>
