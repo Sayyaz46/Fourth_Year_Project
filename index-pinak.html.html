@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Management App</title>
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- Mock Components (Simulating the imported files) ---
+        
+        const LandingPage = ({ onLogin, navigateTo }) => (
+            <div className="flex flex-col items-center justify-center min-h-screen space-y-6">
+                <h1 className="text-4xl font-bold text-indigo-700">Property Management App</h1>
+                <p className="text-gray-600">Please select a role to proceed:</p>
+                <div className="flex space-x-4">
+                    <button onClick={() => onLogin('tenant')} className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded shadow">Login as Tenant</button>
+                    <button onClick={() => onLogin('landlord')} className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded shadow">Login as Landlord</button>
+                    <button onClick={() => onLogin('admin')} className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded shadow">Login as Admin</button>
+                </div>
+                <div className="mt-4">
+                     <button onClick={() => navigateTo('properties')} className="text-indigo-500 hover:underline">View Properties as Guest</button>
+                </div>
+            </div>
+        );
+
+        const TenantDashboard = ({ navigateTo, onLogout }) => (
+            <div className="p-8">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl font-bold text-gray-800">Tenant Dashboard</h1>
+                    <button onClick={onLogout} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Logout</button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-6 bg-white rounded shadow border hover:shadow-lg cursor-pointer transition" onClick={() => navigateTo('properties')}>
+                        <h2 className="text-xl font-semibold text-blue-600">Find Properties</h2>
+                        <p className="text-gray-500">Browse available listings.</p>
+                    </div>
+                    <div className="p-6 bg-white rounded shadow border hover:shadow-lg cursor-pointer transition" onClick={() => navigateTo('maintenance')}>
+                        <h2 className="text-xl font-semibold text-yellow-600">Maintenance Request</h2>
+                        <p className="text-gray-500">Report an issue.</p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const LandlordDashboard = ({ navigateTo, onLogout }) => (
+            <div className="p-8">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl font-bold text-gray-800">Landlord Dashboard</h1>
+                    <button onClick={onLogout} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Logout</button>
+                </div>
+                <div className="p-6 bg-white rounded shadow border">
+                    <h2 className="text-xl font-semibold mb-4">Manage Properties</h2>
+                    <button onClick={() => navigateTo('properties')} className="px-4 py-2 bg-indigo-600 text-white rounded">View My Properties</button>
+                </div>
+            </div>
+        );
+
+        const PropertyListings = ({ navigateTo, userRole, onLogout }) => (
+            <div className="p-8">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold">Property Listings</h1>
+                    <button onClick={onLogout} className="text-sm text-red-500 underline">Logout / Back</button>
+                </div>
+                <p className="mb-4 text-sm text-gray-500">Current Role: {userRole}</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Mock Property Card 1 */}
+                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div className="h-48 bg-gray-300 flex items-center justify-center text-gray-500">Image Placeholder</div>
+                        <div className="p-4">
+                            <h3 className="text-lg font-bold">Luxury Apartment</h3>
+                            <p className="text-gray-600">$1,200 / month</p>
+                            <button onClick={() => navigateTo('property-details', 101)} className="mt-3 w-full px-4 py-2 bg-blue-600 text-white rounded">View Details</button>
+                        </div>
+                    </div>
+                     {/* Mock Property Card 2 */}
+                     <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div className="h-48 bg-gray-300 flex items-center justify-center text-gray-500">Image Placeholder</div>
+                        <div className="p-4">
+                            <h3 className="text-lg font-bold">Cozy Studio</h3>
+                            <p className="text-gray-600">$850 / month</p>
+                            <button onClick={() => navigateTo('property-details', 102)} className="mt-3 w-full px-4 py-2 bg-blue-600 text-white rounded">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const PropertyDetails = ({ propertyId, navigateTo, userRole, onLogout }) => (
+            <div className="p-8 max-w-4xl mx-auto">
+                <button onClick={() => navigateTo('properties')} className="mb-4 text-blue-500 hover:underline">&larr; Back to Listings</button>
+                <div className="bg-white p-6 rounded shadow-lg">
+                    <h1 className="text-3xl font-bold mb-2">Property Details (ID: {propertyId})</h1>
+                    <p className="text-gray-600 mb-6">This is a detailed description of the selected property. It features modern amenities and a great location.</p>
+                    
+                    <div className="flex gap-4">
+                        <button onClick={() => navigateTo('booking', propertyId)} className="px-6 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700">Book Now</button>
+                        <button onClick={() => navigateTo('messaging')} className="px-6 py-3 border border-gray-300 rounded hover:bg-gray-50">Contact Owner</button>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const BookingFlow = ({ propertyId, navigateTo }) => (
+            <div className="p-8 max-w-md mx-auto bg-white rounded shadow-lg mt-10">
+                <h1 className="text-2xl font-bold mb-4">Booking Property #{propertyId}</h1>
+                <div className="space-y-4">
+                    <input type="date" className="w-full border p-2 rounded" />
+                    <button onClick={() => navigateTo('payment')} className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Proceed to Payment</button>
+                    <button onClick={() => navigateTo('property-details', propertyId)} className="w-full text-center text-gray-500 text-sm">Cancel</button>
+                </div>
+            </div>
+        );
+
+        const PaymentFlow = ({ navigateTo }) => (
+            <div className="p-8 max-w-md mx-auto bg-white rounded shadow-lg mt-10 text-center">
+                <h1 className="text-2xl font-bold text-gray-800 mb-4">Secure Payment</h1>
+                <p className="mb-6">Total Amount: $500.00</p>
+                <button onClick={() => { alert("Payment Successful!"); navigateTo('notifications'); }} className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Pay Now</button>
+                <button onClick={() => navigateTo('landing')} className="mt-4 text-blue-500 block">Cancel & Return Home</button>
+            </div>
+        );
+
+        const MaintenanceRequest = ({ navigateTo }) => (
+            <div className="p-8">
+                <h1 className="text-2xl font-bold mb-4">Maintenance Request</h1>
+                <textarea className="w-full border p-3 rounded" rows="4" placeholder="Describe the issue..."></textarea>
+                <div className="mt-4 flex gap-2">
+                    <button onClick={() => { alert("Request Sent!"); navigateTo('tenant-dashboard'); }} className="px-4 py-2 bg-blue-600 text-white rounded">Submit</button>
+                    <button onClick={() => navigateTo('tenant-dashboard')} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+                </div>
+            </div>
+        );
+
+        const AdminPanel = ({ navigateTo, onLogout }) => (
+            <div className="p-8 bg-gray-100 min-h-screen">
+                <h1 className="text-3xl font-bold text-red-600">Admin Panel</h1>
+                <p>System Overview & User Management</p>
+                <button onClick={onLogout} className="mt-4 px-4 py-2 bg-gray-800 text-white rounded">Logout</button>
+            </div>
+        );
+
+        const Messaging = ({ navigateTo, userRole }) => (
+            <div className="p-8">
+                <h1 className="text-2xl font-bold">Messages</h1>
+                <div className="border p-4 h-48 flex items-center justify-center text-gray-400 bg-white mt-4">
+                    No new messages.
+                </div>
+                <button onClick={() => navigateTo('landing')} className="mt-4 text-blue-500">Go Home</button>
+            </div>
+        );
+
+        const Notifications = ({ navigateTo, userRole }) => (
+            <div className="p-8">
+                <h1 className="text-2xl font-bold">Notifications</h1>
+                <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mt-4" role="alert">
+                    <p class="font-bold">Success</p>
+                    <p>Your action has been completed successfully.</p>
+                </div>
+                <button onClick={() => navigateTo('landing')} className="mt-4 px-4 py-2 bg-gray-500 text-white rounded">Back to Home</button>
+            </div>
+        );
+
+        // --- Main Application Logic ---
+
+        function App() {
+          const [userRole, setUserRole] = useState('guest');
+          const [currentView, setCurrentView] = useState('landing');
+          const [selectedPropertyId, setSelectedPropertyId] = useState(null);
+
+          const navigateTo = (view, propertyId) => {
+            setCurrentView(view);
+            if (propertyId) setSelectedPropertyId(propertyId);
+          };
+
+          const login = (role) => {
+            setUserRole(role);
+            if (role === 'tenant') {
+              navigateTo('tenant-dashboard');
+            } else if (role === 'landlord') {
+              navigateTo('landlord-dashboard');
+            } else if (role === 'admin') {
+              navigateTo('admin');
+            }
+          };
+
+          const logout = () => {
+            setUserRole('guest');
+            navigateTo('landing');
+          };
+
+          return (
+            <div className="min-h-screen">
+              {currentView === 'landing' && (
+                <LandingPage onLogin={login} navigateTo={navigateTo} />
+              )}
+              {currentView === 'tenant-dashboard' && userRole === 'tenant' && (
+                <TenantDashboard navigateTo={navigateTo} onLogout={logout} />
+              )}
+              {currentView === 'landlord-dashboard' && userRole === 'landlord' && (
+                <LandlordDashboard navigateTo={navigateTo} onLogout={logout} />
+              )}
+              {currentView === 'properties' && (
+                <PropertyListings navigateTo={navigateTo} userRole={userRole} onLogout={logout} />
+              )}
+              {currentView === 'property-details' && selectedPropertyId && (
+                <PropertyDetails propertyId={selectedPropertyId} navigateTo={navigateTo} userRole={userRole} onLogout={logout} />
+              )}
+              {currentView === 'booking' && selectedPropertyId && (
+                <BookingFlow propertyId={selectedPropertyId} navigateTo={navigateTo} />
+              )}
+              {currentView === 'payment' && (
+                <PaymentFlow navigateTo={navigateTo} />
+              )}
+              {currentView === 'maintenance' && userRole === 'tenant' && (
+                <MaintenanceRequest navigateTo={navigateTo} />
+              )}
+              {currentView === 'admin' && userRole === 'admin' && (
+                <AdminPanel navigateTo={navigateTo} onLogout={logout} />
+              )}
+              {currentView === 'messaging' && (
+                <Messaging navigateTo={navigateTo} userRole={userRole} />
+              )}
+              {currentView === 'notifications' && (
+                <Notifications navigateTo={navigateTo} userRole={userRole} />
+              )}
+            </div>
+          );
+        }
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

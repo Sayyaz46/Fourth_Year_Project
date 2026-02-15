@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details</title>
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- Icon Components (Replacing Lucide Imports with SVGs) ---
+        const ChevronLeft = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>
+        );
+        const ChevronRight = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>
+        );
+        const MapPin = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        );
+        const Bed = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>
+        );
+        const Bath = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-1.5 1.5 1.5 0 0 1 1-1.5 1.5 1.5 0 0 1 1 1.5 1.5 1.5 0 0 0 1 1.5 1.5 1.5 0 0 1 1 1.5 1.5 1.5 0 0 1 1-1.5c.2 2.8-1.5 3-4.5 3"/><path d="M10 8h.01"/><path d="M2 22v-3a4 4 0 0 1 4-4h14a2 2 0 0 1 2 2v3"/><path d="M20 15v6"/></svg>
+        );
+        const Maximize = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        );
+        const Star = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        );
+        const Check = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 6 9 17l-5-5"/></svg>
+        );
+        const LogOut = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        );
+        
+        // --- PropertyDetails Component ---
+        function PropertyDetails({ propertyId, navigateTo, userRole, onLogout }) {
+            const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+            // Mock data
+            const property = {
+                id: propertyId,
+                title: 'Modern Downtown Apartment',
+                location: 'Dhaka, Gulshan',
+                address: '123 Main Street, Gulshan-2, Dhaka',
+                price: 25000,
+                bedrooms: 3,
+                bathrooms: 2,
+                sqft: 1200,
+                rating: 4.8,
+                reviews: 42,
+                type: 'Apartment',
+                description:
+                    'Beautiful modern apartment in the heart of Gulshan. This spacious 3-bedroom unit features contemporary design, high-quality finishes, and stunning city views. Perfect for families or professionals looking for a premium living experience.',
+                amenities: [
+                    'WiFi',
+                    'AC',
+                    'Parking',
+                    'Security',
+                    'Elevator',
+                    'Gym',
+                    'Backup Generator',
+                    'Water Supply',
+                ],
+                features: [
+                    'Fully Furnished',
+                    'Modern Kitchen',
+                    'Balcony',
+                    'Natural Light',
+                    'Pet Friendly',
+                    'Near Metro',
+                ],
+                landlord: {
+                    name: 'Ahmed Khan',
+                    rating: 4.9,
+                    properties: 8,
+                },
+            };
+
+            const images = 3; // Number of images in gallery
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                            <div className="flex items-center justify-between">
+                                <button
+                                    onClick={() => navigateTo('properties')}
+                                    className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+                                >
+                                    <ChevronLeft className="w-5 h-5" />
+                                    <span>Back to Listings</span>
+                                </button>
+                                <div className="flex items-center gap-3">
+                                    {userRole !== 'guest' && (
+                                        <button
+                                            onClick={() =>
+                                                navigateTo(userRole === 'tenant' ? 'tenant-dashboard' : 'landlord-dashboard')
+                                            }
+                                            className="px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+                                        >
+                                            Dashboard
+                                        </button>
+                                    )}
+                                    {userRole !== 'guest' && (
+                                        <button
+                                            onClick={onLogout}
+                                            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 transition-colors"
+                                        >
+                                            <LogOut className="w-5 h-5" />
+                                            <span className="hidden sm:inline">Logout</span>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        {/* Image Gallery */}
+                        <div className="mb-8">
+                            <div className="relative h-96 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl overflow-hidden">
+                                <div className="absolute inset-0 flex items-center justify-center text-white text-2xl">
+                                    Property Image {currentImageIndex + 1}
+                                </div>
+                                {images > 1 && (
+                                    <>
+                                        <button
+                                            onClick={() =>
+                                                setCurrentImageIndex((prev) => (prev === 0 ? images - 1 : prev - 1))
+                                            }
+                                            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 p-2 rounded-full hover:bg-white transition-colors"
+                                        >
+                                            <ChevronLeft className="w-6 h-6 text-gray-900" />
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentImageIndex((prev) => (prev === images - 1 ? 0 : prev + 1))}
+                                            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 p-2 rounded-full hover:bg-white transition-colors"
+                                        >
+                                            <ChevronRight className="w-6 h-6 text-gray-900" />
+                                        </button>
+                                    </>
+                                )}
+                                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                                    {Array.from({ length: images }).map((_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentImageIndex(index)}
+                                            className={`w-2 h-2 rounded-full transition-all ${
+                                                index === currentImageIndex ? 'bg-white w-8' : 'bg-white/50'
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Main Content */}
+                            <div className="lg:col-span-2 space-y-6">
+                                {/* Title and Basic Info */}
+                                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div>
+                                            <h1 className="text-3xl text-gray-900 mb-2">{property.title}</h1>
+                                            <div className="flex items-center gap-2 text-gray-600">
+                                                <MapPin className="w-5 h-5" />
+                                                <span>{property.address}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1 bg-amber-50 px-3 py-2 rounded-lg">
+                                            <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                                            <span className="text-lg text-gray-900">{property.rating}</span>
+                                            <span className="text-sm text-gray-600">({property.reviews})</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-8 text-gray-700">
+                                        <div className="flex items-center gap-2">
+                                            <Bed className="w-5 h-5 text-gray-400" />
+                                            <span>{property.bedrooms} Bedrooms</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Bath className="w-5 h-5 text-gray-400" />
+                                            <span>{property.bathrooms} Bathrooms</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Maximize className="w-5 h-5 text-gray-400" />
+                                            <span>{property.sqft} sqft</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Description */}
+                                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                                    <h2 className="text-xl text-gray-900 mb-4">About This Property</h2>
+                                    <p className="text-gray-600 leading-relaxed">{property.description}</p>
+                                </div>
+
+                                {/* Amenities */}
+                                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                                    <h2 className="text-xl text-gray-900 mb-4">Amenities</h2>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                        {property.amenities.map((amenity) => (
+                                            <div key={amenity} className="flex items-center gap-2 text-gray-700">
+                                                <div className="bg-green-100 p-1 rounded-full">
+                                                    <Check className="w-4 h-4 text-green-600" />
+                                                </div>
+                                                <span>{amenity}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Features */}
+                                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                                    <h2 className="text-xl text-gray-900 mb-4">Key Features</h2>
+                                    <div className="flex flex-wrap gap-2">
+                                        {property.features.map((feature) => (
+                                            <span
+                                                key={feature}
+                                                className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm"
+                                            >
+                                                {feature}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Map Placeholder */}
+                                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                                    <h2 className="text-xl text-gray-900 mb-4">Location</h2>
+                                    <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                                        <div className="text-center">
+                                            <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                                            <p className="text-gray-600">Map View</p>
+                                            <p className="text-sm text-gray-500">{property.address}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Sidebar */}
+                            <div className="lg:col-span-1">
+                                <div className="sticky top-24 space-y-6">
+                                    {/* Booking Card */}
+                                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg">
+                                        <div className="mb-6">
+                                            <div className="flex items-baseline gap-2">
+                                                <span className="text-3xl text-blue-600">৳{property.price.toLocaleString()}</span>
+                                                <span className="text-gray-600">/month</span>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => navigateTo('booking', property.id)}
+                                            className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors mb-4"
+                                        >
+                                            Book Now
+                                        </button>
+
+                                        <div className="space-y-3 pt-4 border-t border-gray-200 text-sm text-gray-600">
+                                            <div className="flex justify-between">
+                                                <span>Security Deposit</span>
+                                                <span className="text-gray-900">৳{(property.price * 2).toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Service Charge</span>
+                                                <span className="text-gray-900">৳{(property.price * 0.1).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Landlord Info */}
+                                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                                        <h3 className="text-lg text-gray-900 mb-4">Landlord</h3>
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                                <span className="text-blue-600 text-lg">
+                                                    {property.landlord.name
+                                                        .split(' ')
+                                                        .map((n) => n[0])
+                                                        .join('')}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p className="text-gray-900">{property.landlord.name}</p>
+                                                <div className="flex items-center gap-1 text-sm text-gray-600">
+                                                    <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                                                    <span>{property.landlord.rating}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p className="text-sm text-gray-600 mb-4">
+                                            {property.landlord.properties} properties listed
+                                        </p>
+                                        <button className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
+                                            Contact Landlord
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        }
+
+        // --- App Component (Wrapper) ---
+        function App() {
+            // Function to handle navigation to different HTML files
+            const navigateTo = (view, propertyId) => {
+                if (view === 'properties') {
+                    window.location.href = 'property-listings.html';
+                } else if (view === 'booking') {
+                    // Change the filename here
+                    window.location.href = 'booking-application.html'; 
+                } else if (view === 'tenant-dashboard') {
+                    window.location.href = 'tenant-dashboard.html';
+                } else if (view === 'landlord-dashboard') {
+                    window.location.href = 'landlord-dashboard.html';
+                } else {
+                    console.log('Navigating to:', view);
+                }
+            };
+
+            const handleLogout = () => {
+                window.location.href = 'index.html';
+            };
+
+            // Setup Role and ID (Simulated)
+            const userRole = 'tenant'; 
+            const propertyId = 1;
+
+            return (
+                <PropertyDetails 
+                    propertyId={propertyId} 
+                    navigateTo={navigateTo} 
+                    userRole={userRole} 
+                    onLogout={handleLogout} 
+                />
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
