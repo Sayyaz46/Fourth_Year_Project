@@ -20,7 +20,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["owner", "tenant", "admin"],
       default: "tenant"
-    }
+    },
+    isVerified: {
+  type: Boolean,
+  default: false
+},
+verificationToken: String
   },
   { timestamps: true }
 );
@@ -40,3 +45,5 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 module.exports = mongoose.model("User", userSchema);
+
+
