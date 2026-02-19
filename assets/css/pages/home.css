@@ -241,3 +241,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 768px) {
+  .why-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .why h2 {
+    font-size: 28px;
+  }
+}

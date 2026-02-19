@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - RentEase</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages/home.css">
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <!-- Hero Style Header -->
+  <section class="hero" style="padding: 60px 20px;">
+    <div class="hero-inner">
+      <h1>Admin Control Panel 🛡</h1>
+      <p>Manage users, properties, and platform settings</p>
+    </div>
+  </section>
+
+  <!-- Admin Cards -->
+  <section class="featured">
+    <div class="container">
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-body">
+            <h3>Manage Users</h3>
+            <p>View and delete tenants and owners</p>
+            <button class="btn-primary" onclick="loadUsers()">View Users</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <h3>Manage Properties</h3>
+            <p>Approve or remove listings</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <h3>Platform Analytics</h3>
+            <p>View system insights</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="adminContent" style="margin-top:40px;"></div>
+
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script src="assets/js/main.js" defer></script>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user || user.role !== "admin") {
+      window.location.href = "login.html";
+    }
+
+    async function loadUsers() {
+      const res = await fetch("http://localhost:5000/api/admin/users", {
+        headers: {
+          "Authorization": `Bearer ${user.token}`
+        }
+      });
+
+      const data = await res.json();
+
+      let html = "<h2>All Users</h2><div class='cards'>";
+
+      data.forEach(u => {
+        html += `
+          <div class="card">
+            <div class="card-body">
+              <h3>${u.name}</h3>
+              <p>${u.email}</p>
+              <p>Role: ${u.role}</p>
+              <button class="btn-primary" onclick="deleteUser('${u._id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+
+      html += "</div>";
+
+      document.getElementById("adminContent").innerHTML = html;
+    }
+
+    async function deleteUser(id) {
+      await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${user.token}`
+        }
+      });
+
+      loadUsers();
+    }
+  </script>
+
+</body>
+</html>
