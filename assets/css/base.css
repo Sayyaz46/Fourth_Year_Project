@@ -5,9 +5,12 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  color: #0f172a;
+  font-family: 'Poppins', sans-serif;
+  color: #222;
+  line-height: 1.6;
+  background: #f5f7fb;
 }
+
 html {
   scroll-behavior: smooth;
 }
