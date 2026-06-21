@@ -1,4 +1,4 @@
-/* NAVBAR */
+/* NAVBAR - Premium & Clean Spacing */
 .navbar {
   background: rgba(255, 255, 255, 0.98);
   border-bottom: 1px solid #e2e8f0;
@@ -9,7 +9,7 @@
 }
 
 .nav-container {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 16px 8%;
   display: flex;
@@ -39,39 +39,55 @@
 }
 
 .logo-tag {
-  font-size: 12px;
-  color: #777;
+  font-size: 13px;
+  color: #64748b;
   font-weight: 400;
-  margin-left: 4px;
 }
 
+/* Navigation Links - Better Spacing */
 .nav-links {
   display: flex;
-  gap: 32px;
+  gap: 35px;           /* Increased space between links */
+  align-items: center;
 }
 
 .nav-links a {
-  color: #333;
+  color: #334155;
   font-weight: 500;
+  text-decoration: none;
   transition: color 0.3s;
+  padding: 8px 0;
 }
 
 .nav-links a:hover {
   color: #2563eb;
 }
 
+/* Action Buttons - Proper Spacing */
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 12px;           /* Nice space between Add Property and Login */
 }
 
 .btn {
   padding: 10px 20px;
   border-radius: 10px;
   font-weight: 600;
-  transition: all 0.3s;
   text-decoration: none;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #2563eb;
+  border: 2px solid #2563eb;
+}
+
+.btn-outline:hover {
+  background: #2563eb;
+  color: white;
 }
 
 .btn-primary {
@@ -85,15 +101,16 @@
   transform: translateY(-2px);
 }
 
-.btn-outline {
-  background: transparent;
-  color: #2563eb;
-  border: 2px solid #2563eb;
-}
-
-.btn-outline:hover {
-  background: #2563eb;
-  color: white;
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    gap: 20px;
+    font-size: 15px;
+  }
+  
+  .nav-container {
+    padding: 14px 5%;
+  }
 }
 
 /* Why Choose Section */

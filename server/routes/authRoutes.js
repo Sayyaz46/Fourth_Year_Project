@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
+
 const User = require("../models/User");
-const { registerUser, loginUser } = require("../controllers/authController");
+const {
+  registerUser,
+  loginUser,
+} = require("../controllers/authController");
 
 // Register
 router.post("/register", registerUser);
@@ -22,6 +27,7 @@ router.get("/verify/:token", async (req, res) => {
 
     user.isVerified = true;
     user.verificationToken = undefined;
+
     await user.save();
 
     res.send(`
@@ -32,6 +38,40 @@ router.get("/verify/:token", async (req, res) => {
 
   } catch (error) {
     res.status(500).send("Verification failed");
+  }
+});
+
+// TEMPORARY ADMIN CREATOR
+router.get("/create-admin", async (req, res) => {
+  try {
+    const existingAdmin = await User.findOne({
+      email: "sayyazmehrab5699@gmail.com",
+    });
+
+    if (existingAdmin) {
+      return res.json({
+        message: "Admin already exists",
+      });
+    }
+
+    const admin = await User.create({
+      name: "Mehrab Admin",
+      email: "sayyazmehrab5699@gmail.com",
+      password: "Pinak420",
+      role: "admin",
+      isVerified: true,
+      verificationToken: null,
+    });
+
+    res.json({
+      message: "Admin created successfully",
+      admin,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
   }
 });
 

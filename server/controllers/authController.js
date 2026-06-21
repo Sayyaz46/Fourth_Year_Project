@@ -15,13 +15,19 @@ exports.registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    const userExists = await User.findOne({ email });
-    if (userExists)
-      return res.status(400).json({ message: "User already exists" });
+    const existingUser = await User.findOne({ email });
 
-    const verificationToken = crypto.randomBytes(32).toString("hex");
+    if (existingUser) {
+      return res.status(400).json({
+        message: "User already exists",
+      });
+    }
 
-    const safeRole = role === "owner" ? "owner" : "tenant";
+    const verificationToken =
+      crypto.randomBytes(32).toString("hex");
+
+    const safeRole =
+      role === "owner" ? "owner" : "tenant";
 
     const user = await User.create({
       name,
@@ -32,43 +38,43 @@ exports.registerUser = async (req, res) => {
       isVerified: false,
     });
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    const transporter =
+      nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
 
-    const verificationLink = `http://localhost:5000/api/auth/verify/${verificationToken}`;
+    const verificationLink =
+      `http://localhost:5000/api/auth/verify/${verificationToken}`;
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Verify your account - RentEase",
+      subject: "Verify your RentEase account",
       html: `
-        <div style="font-family: Arial; padding:20px;">
-          <h2>Welcome to RentEase</h2>
-          <p>Please verify your email by clicking below:</p>
-          <a href="${verificationLink}" 
-             style="padding:10px 15px;
-                    background:#2563eb;
-                    color:white;
-                    text-decoration:none;
-                    border-radius:5px;">
-             Verify Email
-          </a>
-        </div>
+        <h2>Welcome to RentEase</h2>
+        <p>Please verify your email:</p>
+
+        <a href="${verificationLink}">
+          Verify Account
+        </a>
       `,
     });
 
-    res.status(201).json({
-      message: "Registered successfully. Please verify your email before login.",
+    return res.status(201).json({
+      message:
+        "Registration successful. Check your email.",
     });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message });
+
+    return res.status(500).json({
+      message: error.message,
+    });
   }
 };
 
