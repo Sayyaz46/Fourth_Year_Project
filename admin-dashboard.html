@@ -29,39 +29,170 @@
     </div>
   </section>
 
-  <!-- Admin Cards -->
-  <section class="featured">
-    <div class="container">
-      <div class="cards">
+ <section class="featured">
+  <div class="container">
 
-        <div class="card">
-          <div class="card-body">
-            <h3>Manage Users</h3>
-            <p>View and delete tenants and owners</p>
-            <button class="btn-primary" onclick="loadUsers()">View Users</button>
-          </div>
+    <!-- Stats -->
+    <div class="cards">
+
+      <div class="card">
+        <div class="card-body">
+          <h3>👥 Total Users</h3>
+          <h2 id="totalUsers">0</h2>
+          <p>Registered platform users</p>
         </div>
-
-        <div class="card">
-          <div class="card-body">
-            <h3>Manage Properties</h3>
-            <p>Approve or remove listings</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-body">
-            <h3>Platform Analytics</h3>
-            <p>View system insights</p>
-          </div>
-        </div>
-
       </div>
 
-      <div id="adminContent" style="margin-top:40px;"></div>
+      <div class="card">
+        <div class="card-body">
+          <h3>🏠 Properties</h3>
+          <h2>56</h2>
+          <p>Listed properties</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h3>💰 Revenue</h3>
+          <h2>৳1.2M</h2>
+          <p>Total platform revenue</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h3>📋 Requests</h3>
+          <h2>14</h2>
+          <p>Pending approvals</p>
+        </div>
+      </div>
 
     </div>
-  </section>
+
+    <br><br>
+
+    <!-- Main Admin Controls -->
+
+    <div class="cards">
+
+      <div class="card">
+        <div class="card-body">
+          <h3>👤 Manage Users</h3>
+          <p>View, search and remove tenants & landlords</p>
+          <button class="btn-primary" onclick="loadUsers()">
+            View Users
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h3>🏠 Manage Properties</h3>
+          <p>Approve, reject or remove properties</p>
+
+          <button class="btn-primary">
+            View Properties
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h3>💳 Monitor Payments</h3>
+          <p>Track rent payments and revenue</p>
+
+          <button class="btn-primary">
+            View Payments
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h3>⚙️ Platform Settings</h3>
+          <p>Manage system settings and configurations</p>
+
+          <button class="btn-primary">
+            Open Settings
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <br><br>
+
+    <!-- Analytics -->
+
+    <div class="cards">
+
+      <div class="card">
+        <div class="card-body">
+          <h3>📈 Revenue Analytics</h3>
+          <p>Total Revenue</p>
+          <h2>৳1,245,000</h2>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h3>🏢 Active Rentals</h3>
+          <p>Current Occupied Properties</p>
+          <h2>42</h2>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h3>🛠 Maintenance Requests</h3>
+          <p>Pending Issues</p>
+          <h2>8</h2>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h3>📊 Occupancy Rate</h3>
+          <p>Overall Platform Performance</p>
+          <h2>88%</h2>
+        </div>
+      </div>
+
+    </div>
+
+    <br><br>
+
+    <!-- Future Features -->
+
+    <div class="card">
+      <div class="card-body">
+
+        <h2>🚀 Upcoming Features</h2>
+
+        <ul style="margin-top:15px;line-height:2;">
+          <li>AI Property Recommendation System</li>
+          <li>Advanced Revenue Analytics</li>
+          <li>Automated Rent Collection</li>
+          <li>Complaint Management System</li>
+          <li>Maintenance Tracking</li>
+          <li>Email Notification Center</li>
+          <li>Role Based Access Control</li>
+          <li>Audit Logs & Security Monitoring</li>
+          <li>Property Approval Workflow</li>
+          <li>Admin Activity Dashboard</li>
+        </ul>
+
+      </div>
+    </div>
+
+    <br><br>
+
+    <!-- Dynamic Content -->
+
+    <div id="adminContent"></div>
+
+  </div>
+</section>
 
   <!-- Scripts -->
   <script src="assets/js/main.js" defer></script>
@@ -73,34 +204,63 @@
       window.location.href = "login.html";
     }
 
-    async function loadUsers() {
-      const res = await fetch("http://localhost:5000/api/admin/users", {
-        headers: {
-          "Authorization": `Bearer ${user.token}`
-        }
-      });
+async function loadUsers() {
 
-      const data = await res.json();
-
-      let html = "<h2>All Users</h2><div class='cards'>";
-
-      data.forEach(u => {
-        html += `
-          <div class="card">
-            <div class="card-body">
-              <h3>${u.name}</h3>
-              <p>${u.email}</p>
-              <p>Role: ${u.role}</p>
-              <button class="btn-primary" onclick="deleteUser('${u._id}')">Delete</button>
-            </div>
-          </div>
-        `;
-      });
-
-      html += "</div>";
-
-      document.getElementById("adminContent").innerHTML = html;
+  const res = await fetch(
+    "http://localhost:5000/api/admin/users",
+    {
+      headers: {
+        Authorization: `Bearer ${user.token}`
+      }
     }
+  );
+
+  const data = await res.json();
+
+  document.getElementById("totalUsers").innerText =
+    data.length;
+
+  let html = `
+    <h2 style="margin-bottom:20px;">
+      👥 Registered Users
+    </h2>
+
+    <div class="cards">
+  `;
+
+  data.forEach(u => {
+
+    html += `
+      <div class="card">
+        <div class="card-body">
+
+          <h3>${u.name}</h3>
+
+          <p>${u.email}</p>
+
+          <p>
+            <strong>Role:</strong>
+            ${u.role}
+          </p>
+
+          <button
+            class="btn-primary"
+            onclick="deleteUser('${u._id}')"
+          >
+            Delete User
+          </button>
+
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = html;
+}
 
     async function deleteUser(id) {
       await fetch(`http://localhost:5000/api/admin/users/${id}`, {
