@@ -1,7 +1,7 @@
 async function loadComponent(id, file) {
     const container = document.getElementById(id);
     if (!container) return;
-    
+
     try {
         const res = await fetch(`components/${file}`);
         if (res.ok) {
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadComponent("navbar", "navbar.html");
     await loadComponent("why", "why-choose.html");
     await loadComponent("footer", "footer.html");
-    
+
     updateNavbar();
     setupAddPropertyButton();
 });
@@ -41,14 +41,14 @@ function setupAddPropertyButton() {
 
     addBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        
+
         const user = JSON.parse(localStorage.getItem("user"));
-        
-        if (user) {
-            // User is logged in → go to add property page
-            window.location.href = "add-property.html";
+
+        if (user && user.role === "owner") {
+            window.location.href = "owner-dashboard.html";
+        } else if (user) {
+            alert("Only property owners can add listings.");
         } else {
-            // User not logged in → go to login
             window.location.href = "login.html";
         }
     });

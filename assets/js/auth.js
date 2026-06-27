@@ -42,9 +42,8 @@ async function handleRegister() {
         const data = await res.json();
 
         if (res.ok) {
-            alert("Registration successful!");
-            localStorage.setItem("user", JSON.stringify(data));
-            redirectUser(data.role);
+            alert(data.message || "Registration successful. Please verify your email, then login.");
+            window.location.href = "login.html";
         } else {
             alert(data.message || "Registration failed");
         }
@@ -91,7 +90,7 @@ function redirectUser(role) {
             window.location.href = "admin-dashboard.html";
             break;
         case "owner":
-            window.location.href = "owner-dashboard.html"; // or tenant if needed
+            window.location.href = "owner-dashboard.html";
             break;
         default:
             window.location.href = "tenant-dashboard.html";

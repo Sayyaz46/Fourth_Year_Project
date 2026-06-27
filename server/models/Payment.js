@@ -5,8 +5,29 @@ const paymentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
   },
-  amount: Number,
-  method: String,
+  property: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Property"
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  },
+  amount: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  method: {
+    type: String,
+    default: "Manual"
+  },
+  month: String,
+  transactionId: String,
+  paidAt: {
+    type: Date,
+    default: Date.now
+  },
   status: {
     type: String,
     default: "Paid"

@@ -5,12 +5,34 @@ const maintenanceSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
   },
-  issue: String,
+  property: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Property"
+  },
+  issue: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  description: {
+    type: String,
+    default: ""
+  },
   status: {
     type: String,
+    enum: ["Pending", "In Progress", "Resolved", "Rejected"],
     default: "Pending"
   },
-  priority: String
+  priority: {
+    type: String,
+    enum: ["low", "medium", "high", "Low", "Medium", "High"],
+    default: "medium"
+  },
+  ownerNote: String,
+  photos: {
+    type: [String],
+    default: []
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Maintenance", maintenanceSchema);
