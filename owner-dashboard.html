@@ -82,6 +82,9 @@
     const LogOutIcon = ({ className }) => (
       <Icon className={className}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></Icon>
     );
+    const MessageSquareIcon = ({ className }) => (
+      <Icon className={className}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></Icon>
+    );
 
     function StatusBadge({ status }) {
       const normalized = String(status || "pending").toLowerCase();
@@ -114,6 +117,8 @@
       const [bookings, setBookings] = useState([]);
       const [payments, setPayments] = useState([]);
       const [maintenance, setMaintenance] = useState([]);
+      const [messages, setMessages] = useState([]);
+      const [replyDrafts, setReplyDrafts] = useState({});
       const [form, setForm] = useState(emptyPropertyForm);
       const [editingId, setEditingId] = useState(null);
       const [viewingProperty, setViewingProperty] = useState(null);
@@ -155,6 +160,7 @@
           setBookings(data.bookings || []);
           setPayments(data.payments || []);
           setMaintenance(data.maintenance || []);
+          setMessages(data.messages || []);
         } catch (err) {
           setError(err.message);
         } finally {
@@ -296,6 +302,32 @@
         }
       };
 
+      const updateReplyDraft = (threadKey, value) => {
+        setReplyDrafts((current) => ({ ...current, [threadKey]: value }));
+      };
+
+      const sendOwnerMessage = async (thread) => {
+        const body = (replyDrafts[thread.key] || "").trim();
+        if (!body) return;
+
+        try {
+          setError("");
+          await apiFetch("/messages", {
+            method: "POST",
+            body: JSON.stringify({
+              tenantId: thread.tenant?._id,
+              propertyId: thread.property?._id,
+              body
+            })
+          });
+          setReplyDrafts((current) => ({ ...current, [thread.key]: "" }));
+          setMessage("Message sent.");
+          await loadDashboard();
+        } catch (err) {
+          setError(err.message);
+        }
+      };
+
       const logout = () => {
         localStorage.removeItem("user");
         window.location.href = "login.html";
@@ -308,6 +340,38 @@
         { label: "Open Maintenance", value: stats.openMaintenance || 0, icon: WrenchIcon, color: "text-rose-700 bg-rose-50" },
         { label: "Collected Rent", value: money(stats.totalCollected), icon: CreditCardIcon, color: "text-violet-700 bg-violet-50" }
       ];
+
+      const messageThreads = useMemo(() => {
+        const threads = new Map();
+
+        messages.forEach((item) => {
+          const tenantId = item.tenant?._id || item.tenant || "tenant";
+          const propertyId = item.property?._id || "general";
+          const key = `${tenantId}-${propertyId}`;
+
+          if (!threads.has(key)) {
+            threads.set(key, {
+              key,
+              tenant: item.tenant,
+              property: item.property,
+              messages: []
+            });
+          }
+
+          threads.get(key).messages.push(item);
+        });
+
+        return Array.from(threads.values())
+          .map((thread) => ({
+            ...thread,
+            messages: [...thread.messages].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+          }))
+          .sort((a, b) => {
+            const latestA = a.messages[a.messages.length - 1]?.createdAt || 0;
+            const latestB = b.messages[b.messages.length - 1]?.createdAt || 0;
+            return new Date(latestB) - new Date(latestA);
+          });
+      }, [messages]);
 
       if (loading) {
         return (
@@ -377,7 +441,8 @@
                 ["properties", "Properties", BuildingIcon],
                 ["bookings", "Booking Requests", CalendarIcon],
                 ["payments", "Rent Payments", CreditCardIcon],
-                ["maintenance", "Maintenance", WrenchIcon]
+                ["maintenance", "Maintenance", WrenchIcon],
+                ["messages", "Messages", MessageSquareIcon]
               ].map(([id, label, TabIcon]) => (
                 <button
                   key={id}
@@ -649,6 +714,53 @@
                           </button>
                         ))}
                       </div>
+                    </div>
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {activeTab === "messages" && (
+              <section className="space-y-4">
+                {messageThreads.length === 0 && <EmptyState text="No tenant messages yet." />}
+                {messageThreads.map((thread) => (
+                  <div key={thread.key} className="rounded-lg border border-slate-200 bg-white p-5">
+                    <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h3 className="font-semibold text-slate-950">{thread.tenant?.name || "Tenant"}</h3>
+                        <p className="text-sm text-slate-600">{thread.property?.title || "General conversation"}</p>
+                      </div>
+                      <span className="text-xs text-slate-500">{thread.messages.length} messages</span>
+                    </div>
+                    <div className="mb-4 max-h-72 space-y-3 overflow-y-auto rounded-lg bg-slate-50 p-3">
+                      {thread.messages.map((item) => {
+                        const fromOwner = String(item.sender?._id || item.sender) === String(storedUser._id);
+                        return (
+                          <div key={item._id} className={`flex ${fromOwner ? "justify-end" : "justify-start"}`}>
+                            <div className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${fromOwner ? "bg-blue-600 text-white" : "bg-white text-slate-800 border border-slate-200"}`}>
+                              <p>{item.body}</p>
+                              <p className={`mt-1 text-[11px] ${fromOwner ? "text-blue-100" : "text-slate-500"}`}>
+                                {formatDate(item.createdAt)}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <input
+                        value={replyDrafts[thread.key] || ""}
+                        onChange={(event) => updateReplyDraft(thread.key, event.target.value)}
+                        className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none"
+                        placeholder="Write a reply"
+                      />
+                      <button
+                        onClick={() => sendOwnerMessage(thread)}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                      >
+                        <MessageSquareIcon className="h-4 w-4" />
+                        Send
+                      </button>
                     </div>
                   </div>
                 ))}

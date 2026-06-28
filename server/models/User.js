@@ -21,6 +21,14 @@ const userSchema = new mongoose.Schema(
       enum: ["owner", "tenant", "admin"],
       default: "tenant"
     },
+    phone: {
+      type: String,
+      default: ""
+    },
+    profilePicture: {
+      type: String,
+      default: ""
+    },
     isVerified: {
   type: Boolean,
   default: false

@@ -24,6 +24,14 @@ const paymentSchema = new mongoose.Schema({
   },
   month: String,
   transactionId: String,
+  screenshot: {
+    type: String,
+    default: ""
+  },
+  receiptNumber: {
+    type: String,
+    default: ""
+  },
   paidAt: {
     type: Date,
     default: Date.now

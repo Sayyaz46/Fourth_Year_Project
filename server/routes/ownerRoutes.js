@@ -11,6 +11,8 @@ const {
   getOwnerProperties,
   getOwnerProperty,
   getRentPayments,
+  getOwnerMessages,
+  replyToTenant,
   updateBookingStatus,
   updateMaintenanceStatus,
   updateProperty
@@ -37,5 +39,8 @@ router.get("/payments", getRentPayments);
 
 router.get("/maintenance", getMaintenanceRequests);
 router.patch("/maintenance/:id/status", updateMaintenanceStatus);
+
+router.get("/messages", getOwnerMessages);
+router.post("/messages", replyToTenant);
 
 module.exports = router;

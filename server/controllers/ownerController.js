@@ -1,7 +1,10 @@
 const Booking = require("../models/Booking");
 const Maintenance = require("../models/Maintenance");
+const Message = require("../models/Message");
+const Notification = require("../models/Notification");
 const Payment = require("../models/Payment");
 const Property = require("../models/Property");
+const User = require("../models/User");
 
 const VALID_BOOKING_STATUSES = ["pending", "approved", "rejected", "cancelled"];
 const VALID_MAINTENANCE_STATUSES = ["Pending", "In Progress", "Resolved", "Rejected"];
@@ -42,6 +45,8 @@ const buildPropertyPayload = (body) => {
     "address",
     "location",
     "description",
+    "city",
+    "area",
     "propertyType",
     "tenantType",
     "status"
@@ -104,6 +109,14 @@ exports.getOwnerDashboard = asyncHandler(async (req, res) => {
       .limit(20)
   ]);
 
+  const messages = await Message.find({ owner: req.user._id })
+    .populate("tenant", "name email phone profilePicture")
+    .populate("sender", "name role profilePicture")
+    .populate("receiver", "name role profilePicture")
+    .populate("property", "title address")
+    .sort({ createdAt: -1 })
+    .limit(50);
+
   const paidPayments = payments.filter((payment) => {
     const status = String(payment.status || "").toLowerCase();
     return ["paid", "completed", "success", "successful"].includes(status);
@@ -122,7 +135,8 @@ exports.getOwnerDashboard = asyncHandler(async (req, res) => {
     properties,
     bookings,
     payments,
-    maintenance
+    maintenance,
+    messages
   });
 });
 
@@ -241,6 +255,14 @@ exports.updateBookingStatus = asyncHandler(async (req, res) => {
   await updatedBooking.populate("tenant", "name email");
   await updatedBooking.populate("property", "title address rent status");
 
+  await Notification.create({
+    user: updatedBooking.tenant._id || updatedBooking.tenant,
+    type: "booking",
+    title: status === "approved" ? "Booking approved" : status === "rejected" ? "Booking rejected" : "Booking updated",
+    message: `${updatedBooking.property?.title || "Your booking"} was ${status}.`,
+    link: "tenant-dashboard.html"
+  });
+
   res.json(updatedBooking);
 });
 
@@ -290,5 +312,72 @@ exports.updateMaintenanceStatus = asyncHandler(async (req, res) => {
   await updatedRequest.populate("tenant", "name email");
   await updatedRequest.populate("property", "title address");
 
+  await Notification.create({
+    user: updatedRequest.tenant._id || updatedRequest.tenant,
+    type: "maintenance",
+    title: "Maintenance updated",
+    message: `${updatedRequest.issue} is now ${status}.`,
+    link: "tenant-dashboard.html"
+  });
+
   res.json(updatedRequest);
+});
+
+exports.getOwnerMessages = asyncHandler(async (req, res) => {
+  const messages = await Message.find({ owner: req.user._id })
+    .populate("tenant", "name email phone profilePicture")
+    .populate("sender", "name role profilePicture")
+    .populate("receiver", "name role profilePicture")
+    .populate("property", "title address")
+    .sort({ createdAt: 1 });
+
+  res.json(messages);
+});
+
+exports.replyToTenant = asyncHandler(async (req, res) => {
+  const { tenantId, propertyId, body } = req.body;
+
+  if (!tenantId || !body || !String(body).trim()) {
+    return res.status(400).json({ message: "Tenant and message are required" });
+  }
+
+  const tenant = await User.findOne({ _id: tenantId, role: "tenant" });
+
+  if (!tenant) {
+    return res.status(404).json({ message: "Tenant not found" });
+  }
+
+  let property = null;
+  if (propertyId) {
+    property = await Property.findOne({ _id: propertyId, owner: req.user._id });
+
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+  }
+
+  const message = await Message.create({
+    tenant: tenant._id,
+    owner: req.user._id,
+    property: property?._id,
+    sender: req.user._id,
+    receiver: tenant._id,
+    body: String(body).trim()
+  });
+
+  await Notification.create({
+    user: tenant._id,
+    type: "message",
+    title: "New message",
+    message: `${req.user.name} sent you a message.`,
+    link: "tenant-dashboard.html"
+  });
+
+  const populatedMessage = await Message.findById(message._id)
+    .populate("tenant", "name email phone profilePicture")
+    .populate("sender", "name role profilePicture")
+    .populate("receiver", "name role profilePicture")
+    .populate("property", "title address");
+
+  res.status(201).json(populatedMessage);
 });

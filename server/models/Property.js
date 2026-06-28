@@ -15,6 +15,16 @@ const propertySchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  city: {
+    type: String,
+    trim: true,
+    default: ""
+  },
+  area: {
+    type: String,
+    trim: true,
+    default: ""
+  },
   description: {
     type: String,
     default: ""
