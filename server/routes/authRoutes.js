@@ -6,6 +6,8 @@ const User = require("../models/User");
 const {
   registerUser,
   loginUser,
+  forgotPassword,
+  resetPassword
 } = require("../controllers/authController");
 
 // Register
@@ -74,5 +76,16 @@ router.get("/create-admin", async (req, res) => {
     });
   }
 });
+// Forgot Password
+router.post(
+  "/forgot-password",
+  forgotPassword
+);
+
+// Reset Password
+router.post(
+  "/reset-password",
+  resetPassword
+);
 
 module.exports = router;

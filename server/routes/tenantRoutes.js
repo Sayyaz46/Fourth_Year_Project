@@ -75,6 +75,12 @@ const getCurrentBookingFrom = (bookings) => {
 
 router.use(protect);
 router.use(authorizeRoles("tenant"));
+router.get("/test", (req, res) => {
+    res.json({
+        success: true,
+        message: "Tenant route is working"
+    });
+});
 
 router.get("/dashboard", asyncHandler(async (req, res) => {
   const [bookings, approvedBookings, payments, maintenance, notifications, recentMessages, profile] = await Promise.all([
@@ -136,80 +142,87 @@ router.get("/dashboard", asyncHandler(async (req, res) => {
 }));
 
 router.get("/properties", asyncHandler(async (req, res) => {
-  const {
-    search,
-    city,
-    area,
-    minPrice,
-    maxPrice,
-    bedrooms,
-    propertyType
-  } = req.query;
 
-  const filter = { status: "available" };
-  const and = [];
 
-  if (search) {
-    const pattern = regexFor(search);
-    and.push({
-      $or: [
-        { title: pattern },
-        { address: pattern },
-        { location: pattern },
-        { city: pattern },
-        { area: pattern },
-        { propertyType: pattern }
-      ]
-    });
-  }
+    const {
+        search,
+        city,
+        area,
+        minPrice,
+        maxPrice,
+        bedrooms,
+        propertyType
+    } = req.query;
 
-  if (city) {
-    const pattern = regexFor(city);
-    and.push({
-      $or: [
-        { city: pattern },
-        { address: pattern },
-        { location: pattern }
-      ]
-    });
-  }
+    const filter = {
+        status: "available"
+    };
 
-  if (area) {
-    const pattern = regexFor(area);
-    and.push({
-      $or: [
-        { area: pattern },
-        { address: pattern },
-        { location: pattern }
-      ]
-    });
-  }
+    if (search) {
 
-  if (propertyType) {
-    filter.propertyType = regexFor(propertyType);
-  }
+        filter.$or = [
+            { title: { $regex: search, $options: "i" } },
+            { address: { $regex: search, $options: "i" } },
+            { location: { $regex: search, $options: "i" } },
+            { city: { $regex: search, $options: "i" } },
+            { area: { $regex: search, $options: "i" } }
+        ];
 
-  if (bedrooms) {
-    filter.bedrooms = { $gte: toNumber(bedrooms, 0) };
-  }
+    }
 
-  if (minPrice || maxPrice) {
-    filter.rent = {};
-    if (minPrice) filter.rent.$gte = toNumber(minPrice, 0);
-    if (maxPrice) filter.rent.$lte = toNumber(maxPrice, Number.MAX_SAFE_INTEGER);
-  }
+    if (city) {
 
-  if (and.length) {
-    filter.$and = and;
-  }
+        filter.city = {
+            $regex: city,
+            $options: "i"
+        };
 
-  const properties = await Property.find(filter)
-    .populate("owner", "name email phone profilePicture")
-    .sort({ createdAt: -1 });
+    }
 
-  res.json(properties);
+    if (area) {
+
+        filter.area = {
+            $regex: area,
+            $options: "i"
+        };
+
+    }
+
+    if (propertyType) {
+
+        filter.propertyType = propertyType;
+
+    }
+
+    if (bedrooms) {
+
+        filter.bedrooms = {
+            $gte: Number(bedrooms)
+        };
+
+    }
+
+    if (minPrice || maxPrice) {
+
+        filter.rent = {};
+
+        if (minPrice)
+            filter.rent.$gte = Number(minPrice);
+
+        if (maxPrice)
+            filter.rent.$lte = Number(maxPrice);
+
+    }
+
+    const properties = await Property.find(filter)
+        .populate("owner", "name email phone")
+        .sort({
+            createdAt: -1
+        });
+
+    res.json(properties);
+
 }));
-
 router.get("/properties/:id", asyncHandler(async (req, res) => {
   const property = await Property.findById(req.params.id)
     .populate("owner", "name email phone profilePicture");

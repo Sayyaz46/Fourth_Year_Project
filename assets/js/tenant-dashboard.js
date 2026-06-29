@@ -177,30 +177,85 @@ function TenantDashboard() {
     }
   };
 
-  const loadProperties = async (nextFilters = filters) => {
+const loadProperties = async (nextFilters = filters) => {
+
     const params = new URLSearchParams();
+
     Object.entries(nextFilters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && String(value).trim()) {
-        params.set(key, value);
-      }
+
+        if (value !== "" && value !== null && value !== undefined) {
+
+            params.append(key, value);
+
+        }
+
     });
 
     try {
-      setPropertiesLoading(true);
-      setError("");
-      const data = await apiFetch(`/properties${params.toString() ? `?${params}` : ""}`);
-      setProperties(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setPropertiesLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    loadDashboard();
-    loadProperties();
-  }, []);
+        setPropertiesLoading(true);
+
+        const response = await fetch(
+
+            `${API_URL}/properties?${params.toString()}`,
+
+            {
+
+                method: "GET",
+
+                headers: {
+
+                    Authorization: `Bearer ${storedUser.token}`
+
+                }
+
+            }
+
+        );
+
+        if (!response.ok) {
+
+            throw new Error("Unable to load properties");
+
+        }
+
+        const data = await response.json();
+
+        console.log("Properties Received:", data);
+
+        setProperties(data);
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        setError(err.message);
+
+    }
+
+    finally {
+
+        setPropertiesLoading(false);
+
+    }
+
+};
+
+useEffect(() => {
+
+    async function initialize() {
+
+        await loadDashboard();
+
+        await loadProperties();
+
+    }
+
+    initialize();
+
+}, []);
 
   const approvedBookings = useMemo(() => (
     (dashboard.bookings || []).filter((booking) => booking.status === "approved" && booking.property)
